@@ -16,8 +16,7 @@
   "style": "file:./style-index.css",
   "attributes": {
     "data": {
-      "type": "object",
-      "default": {}
+      "type": "object"
     }
   }
 }

@@ -11,7 +11,7 @@ import { __ } from "@wordpress/i18n";
  *
  * @see https://developer.wordpress.org/block-editor/reference-guides/packages/packages-block-editor/#useblockprops
  */
-import { useBlockProps } from "@wordpress/block-editor";
+import { useBlockProps, InspectorControls } from "@wordpress/block-editor";
 
 /**
  * Lets webpack process CSS, SASS or SCSS files referenced in JavaScript files.
@@ -29,39 +29,46 @@ import "./editor.scss";
  *
  * @return {WPElement} Element to render.
  */
-import { useEffect } from "react";
+
+import { PanelBody } from "@wordpress/components";
+import apiFetch from "@wordpress/api-fetch"; // Had to install api-fetch package
 
 export default function Edit({ attributes, setAttributes }) {
-	useEffect(() => {
-		const fetchData = async () => {
-			try {
-				const response = await wp.apiFetch({ url: "https://httpbin.org/get" });
-				setAttributes({ data: response.headers });
-				console.log(response);
-			} catch (error) {
-				console.error("Error fetching data:", error);
-			}
-		};
+	if (attributes.data) {
+		const headers = attributes.data;
 
-		fetchData();
-	}, []); // Empty dependency array ensures the effect runs only once
+		const headerRows = Object.entries(headers).map(([name, value]) => (
+			<div key={name}>
+				<strong>{name}:</strong> {value}
+			</div>
+		));
 
-	if (!attributes.data) {
-		return <p>Loading data from API...</p>;
+		return (
+			<>
+				<div {...useBlockProps()}>
+					<h3>Headers:</h3>
+					{headerRows}
+				</div>
+			</>
+		);
 	}
 
-	const headers = attributes.data;
-
-	const headerRows = Object.entries(headers).map(([name, value]) => (
-		<div key={name}>
-			<strong>{name}:</strong> {value}
-		</div>
-	));
+	apiFetch({ url: "https://httpbin.org/get" }).then((response) => {
+		setAttributes({ data: response.headers });
+	});
 
 	return (
-		<div>
-			<h3>Headers:</h3>
-			{headerRows}
-		</div>
+		<>
+			<div {...useBlockProps()}>
+				<InspectorControls>
+					<PanelBody title="API Fetch Block">
+						<h3>Block Information</h3>
+						<p>This block fetches and displays API headers.</p>
+					</PanelBody>
+				</InspectorControls>
+
+				<p>Fetching data from API...</p>
+			</div>
+		</>
 	);
 }
