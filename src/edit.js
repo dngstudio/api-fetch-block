@@ -3,7 +3,7 @@
  *
  * @see https://developer.wordpress.org/block-editor/reference-guides/packages/packages-i18n/
  */
-import { __ } from '@wordpress/i18n';
+import { __ } from "@wordpress/i18n";
 
 /**
  * React hook that is used to mark the block wrapper element.
@@ -11,7 +11,7 @@ import { __ } from '@wordpress/i18n';
  *
  * @see https://developer.wordpress.org/block-editor/reference-guides/packages/packages-block-editor/#useblockprops
  */
-import { useBlockProps } from '@wordpress/block-editor';
+import { useBlockProps } from "@wordpress/block-editor";
 
 /**
  * Lets webpack process CSS, SASS or SCSS files referenced in JavaScript files.
@@ -19,7 +19,7 @@ import { useBlockProps } from '@wordpress/block-editor';
  *
  * @see https://www.npmjs.com/package/@wordpress/scripts#using-css
  */
-import './editor.scss';
+import "./editor.scss";
 
 /**
  * The edit function describes the structure of your block in the context of the
@@ -29,13 +29,39 @@ import './editor.scss';
  *
  * @return {WPElement} Element to render.
  */
-export default function Edit() {
+import { useEffect } from "react";
+
+export default function Edit({ attributes, setAttributes }) {
+	useEffect(() => {
+		const fetchData = async () => {
+			try {
+				const response = await wp.apiFetch({ url: "https://httpbin.org/get" });
+				setAttributes({ data: response.headers });
+				console.log(response);
+			} catch (error) {
+				console.error("Error fetching data:", error);
+			}
+		};
+
+		fetchData();
+	}, []); // Empty dependency array ensures the effect runs only once
+
+	if (!attributes.data) {
+		return <p>Loading data from API...</p>;
+	}
+
+	const headers = attributes.data;
+
+	const headerRows = Object.entries(headers).map(([name, value]) => (
+		<div key={name}>
+			<strong>{name}:</strong> {value}
+		</div>
+	));
+
 	return (
-		<p { ...useBlockProps() }>
-			{ __(
-				'API Fetch Block – hello from the editor!',
-				'api-fetch-block'
-			) }
-		</p>
+		<div>
+			<h3>Headers:</h3>
+			{headerRows}
+		</div>
 	);
 }

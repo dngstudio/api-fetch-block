@@ -4,7 +4,7 @@
  *
  * @see https://developer.wordpress.org/block-editor/reference-guides/packages/packages-block-editor/#useblockprops
  */
-import { useBlockProps } from '@wordpress/block-editor';
+import { useBlockProps } from "@wordpress/block-editor";
 
 /**
  * The save function defines the way in which the different attributes should
@@ -15,10 +15,24 @@ import { useBlockProps } from '@wordpress/block-editor';
  *
  * @return {WPElement} Element to render.
  */
-export default function save() {
+export default function Save({ attributes }) {
+	if (!attributes.data) {
+		return null; // If data is not available, don't render anything
+	}
+
+	const headers = attributes.data;
+
+	// Create an array of header rows to display the headers
+	const headerRows = Object.entries(headers).map(([name, value]) => (
+		<div key={name}>
+			<strong>{name}:</strong> {value}
+		</div>
+	));
+
 	return (
-		<p { ...useBlockProps.save() }>
-			{ 'API Fetch Block – hello from the saved content!' }
-		</p>
+		<div>
+			<h3>Headers:</h3>
+			{headerRows}
+		</div>
 	);
 }
