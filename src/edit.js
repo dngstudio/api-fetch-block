@@ -62,7 +62,6 @@ export default function Edit({ attributes, setAttributes }) {
 	useEffect(() => {
 		if (cachedData) {
 			setAttributes({ data: JSON.parse(cachedData) });
-			console.log("Current Post Meta:", cachedData); // Log the meta to the console
 		} else {
 			fetchData();
 		}

@@ -92,7 +92,6 @@ function Edit({
       setAttributes({
         data: JSON.parse(cachedData)
       });
-      console.log("Current Post Meta:", cachedData); // Log the meta to the console
     } else {
       fetchData();
     }
@@ -321,7 +320,7 @@ module.exports = window["wp"]["i18n"];
   \************************/
 /***/ ((module) => {
 
-module.exports = JSON.parse('{"$schema":"https://schemas.wp.org/trunk/block.json","apiVersion":2,"name":"create-block/api-fetch-block","version":"0.1.0","title":"API Fetch Block","category":"widgets","icon":"smiley","description":"Example static block scaffolded with Create Block tool.","supports":{"html":false},"textdomain":"api-fetch-block","editorScript":"file:./index.js","editorStyle":"file:./index.css","style":"file:./style-index.css","attributes":{"data":{"type":"object"}}}');
+module.exports = JSON.parse('{"$schema":"https://schemas.wp.org/trunk/block.json","apiVersion":2,"name":"create-block/api-fetch-block","version":"0.1.0","title":"API Fetch Block","category":"widgets","icon":"rest-api","description":"Example static block scaffolded with Create Block tool.","supports":{"html":false},"textdomain":"api-fetch-block","editorScript":"file:./index.js","editorStyle":"file:./index.css","style":"file:./style-index.css","attributes":{"data":{"type":"object"}}}');
 
 /***/ })
 
