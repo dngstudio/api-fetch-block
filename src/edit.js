@@ -30,10 +30,43 @@ import "./editor.scss";
  * @return {WPElement} Element to render.
  */
 
-import { PanelBody } from "@wordpress/components";
 import apiFetch from "@wordpress/api-fetch"; // Had to install api-fetch package
+import { PanelBody } from "@wordpress/components";
+import { useEffect } from "@wordpress/element";
+import { dispatch, select } from "@wordpress/data";
 
 export default function Edit({ attributes, setAttributes }) {
+	const fetchData = () => {
+		apiFetch({ url: "https://httpbin.org/get" })
+			.then((response) => {
+				setAttributes({ data: response.headers });
+
+				// Cache the response using post meta
+				const dataToCache = JSON.stringify(response.headers);
+				const postId = select("core/editor").getCurrentPostId();
+
+				dispatch("core/editor").editPost({
+					meta: {
+						api_response: dataToCache,
+					},
+				});
+			})
+			.catch((error) => {
+				console.error("Error fetching data:", error);
+			});
+	};
+
+	const cachedData =
+		select("core/editor").getEditedPostAttribute("meta")?.api_response;
+
+	useEffect(() => {
+		if (cachedData) {
+			setAttributes({ data: JSON.parse(cachedData) });
+		} else {
+			fetchData();
+		}
+	}, []);
+
 	if (attributes.data) {
 		const headers = attributes.data;
 
@@ -49,26 +82,20 @@ export default function Edit({ attributes, setAttributes }) {
 					<h3>Headers:</h3>
 					{headerRows}
 				</div>
-			</>
-		);
-	}
 
-	apiFetch({ url: "https://httpbin.org/get" }).then((response) => {
-		setAttributes({ data: response.headers });
-	});
-
-	return (
-		<>
-			<div {...useBlockProps()}>
 				<InspectorControls>
 					<PanelBody title="API Fetch Block">
 						<h3>Block Information</h3>
 						<p>This block fetches and displays API headers.</p>
 					</PanelBody>
 				</InspectorControls>
+			</>
+		);
+	}
 
-				<p>Fetching data from API...</p>
-			</div>
-		</>
+	return (
+		<div {...useBlockProps()}>
+			<p>Fetching data from API...</p>
+		</div>
 	);
 }

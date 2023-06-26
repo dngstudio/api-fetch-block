@@ -15,7 +15,7 @@ import { useBlockProps } from "@wordpress/block-editor";
  *
  * @return {WPElement} Element to render.
  */
-export default function Save({ attributes }) {
+export default function save({ attributes }) {
 	if (!attributes.data) {
 		return null; // If data is not available, don't render anything
 	}
@@ -30,7 +30,7 @@ export default function Save({ attributes }) {
 	));
 
 	return (
-		<div>
+		<div {...useBlockProps.save()}>
 			<h3>Headers:</h3>
 			{headerRows}
 		</div>
