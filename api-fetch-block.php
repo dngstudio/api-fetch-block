@@ -33,36 +33,50 @@ class APIFetchWidget extends WP_Widget {
     public function widget($args, $instance) {
         echo $args['before_widget'];
 
-        // Fetch data from the API
-        $response = wp_remote_get('https://httpbin.org/get');
-        if (!is_wp_error($response) && $response['response']['code'] === 200) {
-            $data = json_decode(wp_remote_retrieve_body($response), true);
-            $headers = $data['headers'];
+        // Define the cache key and duration
+        $cache_key = 'api_fetch_data_cache';
+        $cache_duration = 5 * MINUTE_IN_SECONDS;
 
-            // Access and display the headers
-            if (!empty($headers)) {
-                echo '<ul>';
-                foreach ($headers as $name => $value) {
-                    echo '<li><strong>' . esc_html($name) . ':</strong> ' . esc_html($value) . '</li>';
-                }
-                echo '</ul>';
+        // Check if the data is already cached
+        $cached_data = get_transient($cache_key);
+
+        if ($cached_data === false) {
+            // Data is not cached or expired, fetch the fresh data
+            $response = wp_remote_get('https://httpbin.org/get');
+            if (!is_wp_error($response) && $response['response']['code'] === 200) {
+                $data = json_decode(wp_remote_retrieve_body($response), true);
+                $headers = $data['headers'];
+
+                // Cache the data for future use
+                set_transient($cache_key, $headers, $cache_duration);
             } else {
-                // Fallback content when headers are not available
-                echo 'No headers found in the API response.';
+                // Error handling or fallback content when API request fails
+                $headers = false;
+                echo 'Error fetching data from the API.';
             }
         } else {
-            // Error handling or fallback content when API request fails
-            echo 'Error fetching data from the API.';
+            // Data is cached, retrieve it from the cache
+            $headers = $cached_data;
+        }
+
+        // Access and display the headers
+        if (!empty($headers)) {
+            echo '<ul>';
+            foreach ($headers as $name => $value) {
+                echo '<li><strong>' . esc_html($name) . ':</strong> ' . esc_html($value) . '</li>';
+            }
+            echo '</ul>';
+        } else {
+            // Fallback content when headers are not available
+            echo 'No headers found in the API response.';
         }
 
         echo $args['after_widget'];
     }
-
 }
-
-
 
 function register_api_fetch_widget() {
     register_widget('APIFetchWidget');
 }
 add_action('widgets_init', 'register_api_fetch_widget');
+
