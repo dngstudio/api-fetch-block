@@ -33,10 +33,6 @@ To set up the development environment and make changes to the block:
 5. Edit the files in the `src` directory to make changes to the block functionality.
 6. Make sure to build the assets again using `npm run build` before deploying the changes.
 
-## Contributing
-
-Contributions are welcome! If you find any issues or have suggestions for improvements, please open an issue or submit a pull request.
-
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
